@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-worker
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: {{ .Release.Name }}-worker
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-worker
+    spec:
+      containers:
+        - name: {{ .Release.Name }}-worker
+          image: quay.io/vanessa/sregistry
+          env:
+           {{- range $name,$val := .Values.env }}
+           - name: {{ $name }}
+             value: {{ $val | quote }}
+           {{- end }}
+           - name: DB_HOST
+             value: {{ (printf "%s-postgres" .Release.Name) | quote }}
+           - name: DB_NAME
+             value: {{ .Values.global.db.dbname | quote }}
+           - name: DB_USER
+             value: {{ .Values.global.db.dbuser | quote }}
+           - name: DB_PASSWORD
+             value: # use derivePassword
+           - name: REDIS_URL
+             value: {{ (printf "redis://%s-redis/0" .Release.Name) | quote }}
+          command:
+            - python
+            - "/code/manage.py"
+            - "rqworker"
+            - "default"
+          resources:
+            limits:
+              cpu: "0.1"
+          volumeMounts:
+            - mountPath: /code
+              name: code
+            - mountPath: /var/www/static
+              name: static
+            - mountPath: /var/www/images
+              name: images
+      volumes:
+        - name: code
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-uwsgi-code-pv-claim
+        - name: static
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-uwsgi-static-pv-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-uwsgi-images-pv-claim

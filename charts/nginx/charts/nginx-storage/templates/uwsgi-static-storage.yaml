@@ -1,0 +1,33 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-uwsgi-static-pv-volume
+  labels:
+    type: local
+    app: {{ .Release.Name }}-uwsgi
+    role: "static"
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: {{ (printf "%s/uwsgi/static" .Values.global.path.data) }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-uwsgi-static-pv-claim
+  labels:
+    app: {{ .Release.Name }}-uwsgi
+spec:
+  storageClassName: manual
+  selector:
+    matchLabels:
+      role: "static"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi

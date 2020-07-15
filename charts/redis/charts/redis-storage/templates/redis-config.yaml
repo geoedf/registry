@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-redis-config
+data:
+  redis.conf: |-
+{{ .Files.Get "redis.conf" | indent 4 }} 

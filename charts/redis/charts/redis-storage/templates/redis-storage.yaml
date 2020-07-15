@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Release.Name }}-redis-pv-volume
+  labels:
+    type: local
+    app: {{ .Release.Name }}-redis
+    role: "redis"
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: {{ (printf "%s-redis" .Values.global.path.data) }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-redis-pv-claim
+  labels:
+    app: {{ .Release.Name }}-redis
+spec:
+  storageClassName: manual
+  selector:
+    matchLabels:
+      role: "redis"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi

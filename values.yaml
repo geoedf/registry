@@ -1,0 +1,19 @@
+# Default values for geoedf-registry.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# global values used across subcharts
+# path to various directories; modify based on where files are stored
+#
+global:
+  registryDNS: # DNS/hostname for your registry
+  path:
+    data: # data path to hold Redis and Postgres data
+    certs: # path to certificates directory
+    keys: # path to certificate keys directory
+  db:
+   dbname: # postgres database name to be created
+   dbuser: # postgres username
+  tls:
+    crt: | # base64 encoded certificate chain
+    key: | # base64 encoded key

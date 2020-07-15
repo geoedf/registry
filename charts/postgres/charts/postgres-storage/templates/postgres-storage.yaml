@@ -1,0 +1,33 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-postgres-pv-volume
+  labels:
+    type: local
+    app: {{ .Release.Name }}-postgres
+    role: "postgres"
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: {{ (printf "%s/postgres" .Values.global.path.data) }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-postgres-pv-claim
+  labels:
+    app: {{ .Release.Name }}-postgres
+spec:
+  storageClassName: manual
+  selector:
+    matchLabels:
+      role: "postgres"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi

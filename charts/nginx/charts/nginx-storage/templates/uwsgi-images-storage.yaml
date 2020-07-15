@@ -1,0 +1,33 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-uwsgi-images-pv-volume
+  labels:
+    type: local
+    app: {{ .Release.Name }}-uwsgi
+    role: "images"
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: {{ (printf "%s/uwsgi/images" .Values.global.path.data) }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-uwsgi-images-pv-claim
+  labels:
+    app: {{ .Release.Name }}-uwsgi
+spec:
+  storageClassName: manual
+  selector:
+    matchLabels:
+      role: "images"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
